@@ -1,26 +1,891 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fff8f0;
+  --card: rgba(255, 248, 240, 0.74);
+  --text: #4a343b;
+  --muted: #8f737c;
+  --border: rgba(248, 187, 208, 0.42);
+  --gold: #f8bbd0;
+  --gold-dark: #c76786;
+  --danger: #d45c4c;
+  --success: #4f9b72;
+  --radius: 28px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 248, 240, 0.92), transparent 34%),
+    linear-gradient(135deg, #f8bbd0 0%, #fff8f0 48%, #f8bbd0 100%);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.photoPage {
+  position: relative;
+  min-height: 180vh;
+  padding-top: 72px;
+  padding-bottom: 120px;
+  z-index: 1;
+}
+
+.backgroundPhotos {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 248, 240, 0.92), transparent 34%),
+    radial-gradient(circle at 82% 70%, rgba(248, 187, 208, 0.48), transparent 32%),
+    linear-gradient(135deg, #f8bbd0 0%, #fff8f0 52%, #f8bbd0 100%);
+}
+
+.photoLayer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+.photoOne {
+  background-image: url("/photos/photo1.jpg");
+  animation: photoFadeOne 24s infinite;
+}
+
+.photoTwo {
+  background-image: url("/photos/photo2.jpg");
+  animation: photoFadeTwo 24s infinite;
+}
+
+.photoThree {
+  background-image: url("/photos/photo3.jpg");
+  animation: photoFadeThree 24s infinite;
+}
+
+.photoOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 248, 240, 0.76) 0%,
+      rgba(248, 187, 208, 0.44) 38%,
+      rgba(255, 248, 240, 0.90) 100%),
+    rgba(248, 187, 208, 0.22);
+  z-index: 2;
+}
+
+.bookingIntro {
+  width: min(720px, 100%);
+  margin: 0 auto 24px;
+  text-align: center;
+  padding: 0 12px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--gold-dark);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.introText {
+  margin: 12px auto 0;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.bookingCard,
+.adminLoginCard,
+.adminCard,
+.adminHeader,
+.textBlock {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 34px 110px rgba(143, 115, 124, 0.26);
+  backdrop-filter: blur(22px);
+}
+
+.bookingCard {
+  padding: 40px;
+}
+
+.floatingCard {
+  width: min(720px, 100%);
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  margin-bottom: 28px;
+}
+
+.sectionHeader h2,
+.adminCard h2 {
+  margin: 0;
+  font-size: 32px;
+  letter-spacing: -0.04em;
+}
+
+.sectionHeader p,
+.muted {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.calendarField {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.datePickerTrigger {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 16px;
+  text-align: left;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.datePickerTrigger:hover,
+.datePickerTrigger:focus {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(248, 187, 208, 0.24);
+  outline: none;
+}
+
+.datePickerIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(248, 187, 208, 0.36);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.customCalendar {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 10;
+  width: min(100%, 360px);
+  border-radius: 24px;
+  background: rgba(255, 248, 240, 0.96);
+  border: 1px solid rgba(248, 187, 208, 0.62);
+  box-shadow: 0 26px 70px rgba(170, 92, 126, 0.22);
+  padding: 18px;
+  backdrop-filter: blur(18px);
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.calendarHeader strong {
+  text-transform: capitalize;
+}
+
+.calendarHeader button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(248, 187, 208, 0.62);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.56);
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendarWeekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.calendarDay:hover {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+  background: rgba(248, 187, 208, 0.22);
+}
+
+.calendarDay:active {
+  transform: scale(0.98);
+}
+
+.mutedDay {
+  color: rgba(143, 115, 124, 0.45);
+}
+
+.selectedDay {
+  background: #f8bbd0;
+  color: #4a343b;
+  border-radius: 999px;
+}
+
+.selectedDay:hover {
+  background: #f8bbd0;
+}
+
+.timeField {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.timePickerTrigger {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 16px;
+  text-align: left;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.timePickerTrigger:hover,
+.timePickerTrigger:focus {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(248, 187, 208, 0.24);
+  outline: none;
+}
+
+.timePickerIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(248, 187, 208, 0.36);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.customTimePicker {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 10;
+  width: min(100%, 360px);
+  border-radius: 24px;
+  background: rgba(255, 248, 240, 0.96);
+  border: 1px solid rgba(248, 187, 208, 0.62);
+  box-shadow: 0 26px 70px rgba(170, 92, 126, 0.22);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  backdrop-filter: blur(18px);
+}
+
+.timeColumn {
+  display: grid;
+  gap: 10px;
+}
+
+.timeColumn strong {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.timeOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-height: 184px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.timeOption {
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.timeOption:hover {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+  background: rgba(248, 187, 208, 0.22);
+}
+
+.timeOption:active {
+  transform: scale(0.98);
+}
+
+.selectedTimeOption {
+  background: #f8bbd0;
+  color: #4a343b;
+  border-radius: 999px;
+}
+
+.selectedTimeOption:hover {
+  background: #f8bbd0;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 15px 16px;
+  color: var(--text);
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(143, 115, 124, 0.62);
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(248, 187, 208, 0.32);
+}
+
+.submitButton,
+.adminLoginCard button,
+.requestActions button {
+  border: none;
+  border-radius: 999px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #f8bbd0, #fff8f0);
+  color: var(--text);
+  font-weight: 800;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.submitButton:hover,
+.adminLoginCard button:hover,
+.requestActions button:hover {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+}
+
+.submitButton:active,
+.adminLoginCard button:active,
+.requestActions button:active,
+.datePickerTrigger:active,
+.timePickerTrigger:active {
+  transform: scale(0.98);
+}
+
+.successMessage {
+  margin: 0;
+  color: #c75f86;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.scrollSection {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 0 40px;
+}
+
+.textBlock {
+  width: min(720px, 100%);
+  padding: 42px;
+}
+
+.textBlock h2 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.textBlock p {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* Admin panel stilleri */
+
+.adminPage {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+  min-height: 100vh;
+}
+
+.adminLoginCard {
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 32px;
+  display: grid;
+  gap: 16px;
+}
+
+.adminLoginCard h1 {
+  margin: 0;
+  font-size: 42px;
+  letter-spacing: -0.04em;
+}
+
+.adminLoginCard p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.adminHeader {
+  padding: 32px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.adminHeader h1 {
+  margin: 0;
+  font-size: 48px;
+  letter-spacing: -0.05em;
+}
+
+.adminGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.singleColumnAdminGrid {
+  grid-template-columns: 1fr;
+}
+
+.adminCard {
+  padding: 28px;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.requestItem {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  background: rgba(255, 248, 240, 0.58);
+}
+
+.requestItem p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.smallButton,
+.secondaryButton,
+.dangerButton {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.34);
+  color: var(--text);
+  font-weight: 700;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.secondaryButton {
+  background: rgba(255, 255, 255, 0.72) !important;
+  color: #4a343b !important;
+  border: 1px solid rgba(248, 187, 208, 0.9) !important;
+  box-shadow: 0 10px 28px rgba(248, 187, 208, 0.14);
+}
+
+.secondaryButton:hover {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+  background: rgba(255, 248, 240, 0.92) !important;
+  border-color: #f8bbd0 !important;
+}
+
+.dangerButton {
+  background: var(--danger) !important;
+  color: white !important;
+  border-color: var(--danger) !important;
+}
+
+.dangerButton:hover {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+}
+
+.secondaryButton:active,
+.dangerButton:active {
+  transform: scale(0.98);
+}
+
+.requestTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.status {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status.pending {
+  background: rgba(248, 187, 208, 0.28);
+  color: #9f5870;
+}
+
+.status.approved {
+  background: rgba(105, 194, 143, 0.16);
+  color: var(--success);
+}
+
+.status.rejected {
+  background: rgba(212, 92, 76, 0.16);
+  color: var(--danger);
+}
+
+.requestActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-right: 64px;
+}
+
+.deleteIconButton {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(212, 92, 76, 0.42);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.34);
+  color: var(--danger);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.deleteIconButton:hover {
+  transform: scale(1.08);
+  filter: brightness(1.03);
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.deleteIconButton:active {
+  transform: scale(0.98);
+}
+
+@keyframes photoFadeOne {
+
+  0%,
+  28% {
+    opacity: 0.38;
+  }
+
+  34%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes photoFadeTwo {
+
+  0%,
+  28% {
+    opacity: 0;
+  }
+
+  34%,
+  62% {
+    opacity: 0.38;
+  }
+
+  68%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes photoFadeThree {
+
+  0%,
+  62% {
+    opacity: 0;
+  }
+
+  68%,
+  94% {
+    opacity: 0.38;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 800px) {
+
+  .page,
+  .adminPage {
+    width: min(100% - 20px, 1180px);
+  }
+
+  .photoPage {
+    padding-top: 40px;
+  }
+
+  .bookingIntro {
+    text-align: left;
+  }
+
+  .bookingCard {
+    padding: 24px;
+  }
+
+  .floatingCard {
+    width: 100%;
+  }
+
+  .adminGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .adminCard,
+  .adminHeader {
+    padding: 24px;
+  }
+
+  .adminHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .adminHeader h1 {
+    font-size: 38px;
+  }
+
+  .textBlock {
+    padding: 28px;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(248, 187, 208, 0.32);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+}
+
+.themeModal {
+  width: min(420px, 100%);
+  background: rgba(255, 248, 240, 0.98);
+  border: 2px solid rgba(248, 187, 208, 0.9);
+  border-radius: 28px;
+  box-shadow: 0 26px 80px rgba(170, 92, 126, 0.24);
+  padding: 30px;
+  text-align: center;
+  color: var(--text);
+}
+
+.modalIcon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  border-radius: 999px;
+  background: #f8bbd0;
+  color: #4a343b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.successModal {
+  border-color: rgba(248, 187, 208, 0.9);
+}
+
+.successIcon {
+  background: #f8bbd0;
+  color: #4a343b;
+}
+
+.themeModal h3 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.themeModal p {
+  margin: 10px 0 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.themeModal button {
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #f8bbd0, #fff8f0);
+  color: var(--text);
+  font-weight: 800;
+  box-shadow: 0 12px 30px rgba(170, 92, 126, 0.16);
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.modalSecondaryButton,
+.modalDangerButton {
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.themeModal button:hover,
+.modalSecondaryButton:hover,
+.modalDangerButton:hover {
+  transform: scale(1.04);
+  filter: brightness(1.03);
+}
+
+.themeModal button:active,
+.modalSecondaryButton:active,
+.modalDangerButton:active {
+  transform: scale(0.98);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.themeModal .modalCancelButton {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(248, 187, 208, 0.9);
+}
+
+.themeModal .modalDeleteButton {
+  background: var(--danger);
+  color: white;
 }
