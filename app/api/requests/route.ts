@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
   if (!requestDate || !requestTime || !requesterName || !contact) {
     return NextResponse.json(
-      { message: "Eksik bilgi gönderildi." },
+      { message: "Lütfen tarih, saat, ad ve e-posta adresini doldur." },
       { status: 400 }
     );
   }
