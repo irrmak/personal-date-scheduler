@@ -173,7 +173,7 @@ export default function AdminPage() {
                   </p>
 
                   <p>
-                    <strong>İletişim:</strong> {request.contact}
+                    <strong>E-posta:</strong> {request.contact}
                   </p>
 
                   {request.note && (

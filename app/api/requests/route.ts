@@ -13,6 +13,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (!isValidEmail(contact)) {
+    return NextResponse.json(
+      { message: "Lütfen geçerli bir e-posta adresi gir." },
+      { status: 400 }
+    );
+  }
+
   const { error } = await supabaseAdmin.from("date_requests").insert({
     request_date: requestDate,
     request_time: requestTime,
@@ -32,4 +39,8 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     message: "Talebin başarıyla alındı.",
   });
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }

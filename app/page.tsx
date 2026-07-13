@@ -34,7 +34,12 @@ export default function HomePage() {
     event.preventDefault();
 
     if (!selectedDate || !selectedTime || !requesterName || !contact) {
-      setErrorMessage("Lütfen tarih, saat, ad ve iletişim bilgisini doldur.");
+      setErrorMessage("Lütfen tarih, saat, ad ve e-posta adresini doldur.");
+      return;
+    }
+
+    if (!isValidEmail(contact)) {
+      setErrorMessage("Lütfen geçerli bir e-posta adresi gir.");
       return;
     }
 
@@ -251,11 +256,12 @@ export default function HomePage() {
           </label>
 
           <label>
-            İletişim bilgin
+            E-posta adresin
             <input
+              type="email"
               value={contact}
               onChange={(event) => setContact(event.target.value)}
-              placeholder="Instagram, telefon veya e-posta"
+              placeholder="ornek@mail.com"
             />
           </label>
 
@@ -355,4 +361,8 @@ function formatCalendarTitle(date: Date) {
     month: "long",
     year: "numeric",
   }).format(date);
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
