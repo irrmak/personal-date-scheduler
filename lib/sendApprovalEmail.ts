@@ -1,36 +1,72 @@
+import { createRequire } from "node:module";
+
+type SendApprovalEmailParams = {
+  to: string;
+  requesterName: string;
+  requestDate: string | null;
+  requestTime: string | null;
+};
+
+type MailOptions = {
+  from: string;
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+};
+
+type SmtpOptions = {
+  host: string;
+  port: number;
+  secure: boolean;
+  auth: {
+    user: string;
+    pass: string;
+  };
+};
+
+type NodemailerModule = {
+  createTransport: (options: SmtpOptions) => {
+    sendMail: (options: MailOptions) => Promise<unknown>;
+  };
+};
+
+const require = createRequire(import.meta.url);
+const nodemailer = require("nodemailer") as NodemailerModule;
+
 export async function sendApprovalEmail({
   to,
   requesterName,
   requestDate,
   requestTime,
-}: {
-  to: string;
-  requesterName: string;
-  requestDate: string | null;
-  requestTime: string | null;
-}) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.MAIL_FROM || "onboarding@resend.dev";
+}: SendApprovalEmailParams) {
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  const from = process.env.MAIL_FROM || smtpUser;
 
-  if (!apiKey) {
-    console.error("RESEND_API_KEY is missing.");
+  if (!smtpUser || !smtpPass || !from) {
+    console.error("SMTP email environment variables are missing.");
     return {
       success: false,
-      error: "RESEND_API_KEY is missing.",
+      error: "SMTP email environment variables are missing.",
     };
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: Number(process.env.SMTP_PORT || 465),
+    secure: true,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
     },
-    body: JSON.stringify({
-      from,
-      to,
-      subject: "Planlama talebin onaylandı",
-      text: `Merhaba ${requesterName},
+  });
+
+  const mail = {
+    from,
+    to,
+    subject: "Planlama talebin onaylandı",
+    text: `Merhaba ${requesterName},
 
 Planlama talebin onaylandı.
 
@@ -38,33 +74,32 @@ Tarih: ${requestDate || "-"}
 Saat: ${requestTime || "-"}
 
 Görüşmek üzere.`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2>Planlama talebin onaylandı</h2>
-          <p>Merhaba ${requesterName},</p>
-          <p>Planlama talebin onaylandı.</p>
-          <p><strong>Tarih:</strong> ${requestDate || "-"}</p>
-          <p><strong>Saat:</strong> ${requestTime || "-"}</p>
-          <p>Görüşmek üzere.</p>
-        </div>
-      `,
-    }),
-  });
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>Planlama talebin onaylandı</h2>
+        <p>Merhaba ${requesterName},</p>
+        <p>Planlama talebin onaylandı.</p>
+        <p><strong>Tarih:</strong> ${requestDate || "-"}</p>
+        <p><strong>Saat:</strong> ${requestTime || "-"}</p>
+        <p>Görüşmek üzere.</p>
+      </div>
+    `,
+  };
 
-  const data = await response.json().catch(() => null);
+  try {
+    const data = await transporter.sendMail(mail);
+    console.log("SMTP email sent:", data);
 
-  if (!response.ok) {
-    console.error("Resend email failed:", data);
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    console.error("SMTP email failed:", error);
+
     return {
       success: false,
-      error: data,
+      error,
     };
   }
-
-  console.log("Resend email sent:", data);
-
-  return {
-    success: true,
-    data,
-  };
 }
