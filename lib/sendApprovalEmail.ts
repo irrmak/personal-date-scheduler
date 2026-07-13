@@ -53,8 +53,8 @@ export async function sendApprovalEmail({
   }
 
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: Number(process.env.SMTP_PORT || 465),
+    host: "smtp.gmail.com",
+    port: 465,
     secure: true,
     auth: {
       user: smtpUser,
