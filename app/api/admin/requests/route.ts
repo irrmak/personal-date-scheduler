@@ -65,20 +65,31 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  if (
-    status === "approved" &&
-    updatedRequest?.contact &&
-    isEmail(updatedRequest.contact)
-  ) {
-    try {
-      await sendApprovalEmail({
-        to: updatedRequest.contact,
-        requesterName: updatedRequest.requester_name,
-        requestDate: updatedRequest.request_date,
-        requestTime: updatedRequest.request_time,
-      });
-    } catch (emailError) {
-      console.error("Approval email could not be sent:", emailError);
+  if (status === "approved") {
+    if (!updatedRequest?.contact || !isValidEmail(updatedRequest.contact)) {
+      console.warn("Approval email skipped. Contact is not a valid email.");
+    } else {
+      try {
+        const emailResult = await sendApprovalEmail({
+          to: updatedRequest.contact,
+          requesterName: updatedRequest.requester_name,
+          requestDate: updatedRequest.request_date,
+          requestTime: updatedRequest.request_time,
+        });
+
+        if (!emailResult.success) {
+          return NextResponse.json({
+            message: "Talep onaylandı fakat e-posta gönderilemedi.",
+            emailWarning: true,
+          });
+        }
+      } catch (emailError) {
+        console.error("Approval email could not be sent:", emailError);
+        return NextResponse.json({
+          message: "Talep onaylandı fakat e-posta gönderilemedi.",
+          emailWarning: true,
+        });
+      }
     }
   }
 
@@ -119,6 +130,6 @@ export async function DELETE(request: NextRequest) {
   });
 }
 
-function isEmail(value: string) {
+function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
