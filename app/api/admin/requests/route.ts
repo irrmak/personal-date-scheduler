@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendApprovalEmail } from "@/lib/sendApprovalEmail";
 import { supabaseAdmin } from "@/lib/supabase";
 
 function checkAdmin(request: NextRequest) {
@@ -50,16 +51,35 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const { error } = await supabaseAdmin
+  const { data: updatedRequest, error } = await supabaseAdmin
     .from("date_requests")
     .update({ status })
-    .eq("id", id);
+    .eq("id", id)
+    .select("requester_name, contact, request_date, request_time")
+    .single();
 
   if (error) {
     return NextResponse.json(
       { message: error.message || "Talep güncellenemedi." },
       { status: 500 }
     );
+  }
+
+  if (
+    status === "approved" &&
+    updatedRequest?.contact &&
+    isEmail(updatedRequest.contact)
+  ) {
+    try {
+      await sendApprovalEmail({
+        to: updatedRequest.contact,
+        requesterName: updatedRequest.requester_name,
+        requestDate: updatedRequest.request_date,
+        requestTime: updatedRequest.request_time,
+      });
+    } catch (emailError) {
+      console.error("Approval email could not be sent:", emailError);
+    }
   }
 
   return NextResponse.json({
@@ -97,4 +117,8 @@ export async function DELETE(request: NextRequest) {
   return NextResponse.json({
     message: "Talep silindi.",
   });
+}
+
+function isEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
