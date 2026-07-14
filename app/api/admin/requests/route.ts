@@ -81,16 +81,29 @@ export async function PATCH(request: NextRequest) {
           return NextResponse.json({
             message: "Talep onaylandı fakat e-posta gönderilemedi.",
             emailWarning: true,
+            emailError: emailResult.error || "Bilinmeyen EmailJS hatası",
           });
         }
       } catch (emailError) {
-        console.error("Approval email could not be sent:", emailError);
+        const errorMessage =
+          emailError instanceof Error
+            ? emailError.message
+            : JSON.stringify(emailError);
+
+        console.error("Approval email could not be sent:", errorMessage);
+
         return NextResponse.json({
           message: "Talep onaylandı fakat e-posta gönderilemedi.",
           emailWarning: true,
+          emailError: errorMessage,
         });
       }
     }
+
+    return NextResponse.json({
+      message: "Talep güncellendi. Onay e-postası gönderildi.",
+      emailSent: true,
+    });
   }
 
   return NextResponse.json({

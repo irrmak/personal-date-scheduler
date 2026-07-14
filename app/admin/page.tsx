@@ -73,10 +73,19 @@ export default function AdminPage() {
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      alert(errorData.message || "Talep güncellenemedi.");
+      alert(data.message || "Talep güncellenemedi.");
       return;
+    }
+
+    if (data.emailWarning) {
+      alert(
+        `${data.message}\n\nHata: ${data.emailError || "Bilinmeyen hata"}`
+      );
+    } else if (data.emailSent) {
+      alert("Talep onaylandı ve e-posta gönderildi.");
     }
 
     fetchRequests();

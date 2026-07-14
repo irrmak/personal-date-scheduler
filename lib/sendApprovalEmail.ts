@@ -64,11 +64,14 @@ export async function sendApprovalEmail({
       data,
     };
   } catch (error) {
-    console.error("EmailJS email failed:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : JSON.stringify(error);
+
+    console.error("EmailJS email failed:", errorMessage);
 
     return {
       success: false,
-      error,
+      error: errorMessage,
     };
   }
 }
