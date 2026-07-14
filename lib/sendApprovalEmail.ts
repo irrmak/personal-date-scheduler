@@ -7,32 +7,20 @@ type SendApprovalEmailParams = {
   requestTime: string | null;
 };
 
-type MailOptions = {
-  from: string;
-  to: string;
-  subject: string;
-  text: string;
-  html: string;
-};
-
-type SmtpOptions = {
-  host: string;
-  port: number;
-  secure: boolean;
-  auth: {
-    user: string;
-    pass: string;
-  };
-};
-
-type NodemailerModule = {
-  createTransport: (options: SmtpOptions) => {
-    sendMail: (options: MailOptions) => Promise<unknown>;
-  };
+type EmailJsModule = {
+  send: (
+    serviceId: string,
+    templateId: string,
+    templateParams: Record<string, string>,
+    options: {
+      publicKey: string;
+      privateKey: string;
+    }
+  ) => Promise<unknown>;
 };
 
 const require = createRequire(import.meta.url);
-const nodemailer = require("nodemailer") as NodemailerModule;
+const emailjs = require("@emailjs/nodejs") as EmailJsModule;
 
 export async function sendApprovalEmail({
   to,
@@ -40,62 +28,43 @@ export async function sendApprovalEmail({
   requestDate,
   requestTime,
 }: SendApprovalEmailParams) {
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const from = process.env.MAIL_FROM || smtpUser;
+  const serviceId = process.env.EMAILJS_SERVICE_ID;
+  const templateId = process.env.EMAILJS_TEMPLATE_ID;
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+  const privateKey = process.env.EMAILJS_PRIVATE_KEY;
 
-  if (!smtpUser || !smtpPass || !from) {
-    console.error("SMTP email environment variables are missing.");
+  if (!serviceId || !templateId || !publicKey || !privateKey) {
+    console.error("EmailJS environment variables are missing.");
     return {
       success: false,
-      error: "SMTP email environment variables are missing.",
+      error: "EmailJS environment variables are missing.",
     };
   }
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-  });
-
-  const mail = {
-    from,
-    to,
-    subject: "Planlama talebin onaylandı",
-    text: `Merhaba ${requesterName},
-
-Planlama talebin onaylandı.
-
-Tarih: ${requestDate || "-"}
-Saat: ${requestTime || "-"}
-
-Görüşmek üzere.`,
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-        <h2>Planlama talebin onaylandı</h2>
-        <p>Merhaba ${requesterName},</p>
-        <p>Planlama talebin onaylandı.</p>
-        <p><strong>Tarih:</strong> ${requestDate || "-"}</p>
-        <p><strong>Saat:</strong> ${requestTime || "-"}</p>
-        <p>Görüşmek üzere.</p>
-      </div>
-    `,
-  };
-
   try {
-    const data = await transporter.sendMail(mail);
-    console.log("SMTP email sent:", data);
+    const data = await emailjs.send(
+      serviceId,
+      templateId,
+      {
+        to_email: to,
+        requester_name: requesterName,
+        request_date: requestDate || "-",
+        request_time: requestTime || "-",
+      },
+      {
+        publicKey,
+        privateKey,
+      }
+    );
+
+    console.log("EmailJS email sent:", data);
 
     return {
       success: true,
       data,
     };
   } catch (error) {
-    console.error("SMTP email failed:", error);
+    console.error("EmailJS email failed:", error);
 
     return {
       success: false,
