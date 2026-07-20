@@ -866,6 +866,14 @@ textarea:focus {
   color: #4a343b;
 }
 
+.adminStatusModal p {
+  white-space: pre-line;
+}
+
+.errorModal {
+  border-color: rgba(248, 187, 208, 0.9);
+}
+
 .themeModal h3 {
   margin: 0;
   font-size: 28px;

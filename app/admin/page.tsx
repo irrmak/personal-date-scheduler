@@ -18,6 +18,10 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null);
+  const [adminMessage, setAdminMessage] = useState("");
+  const [adminMessageType, setAdminMessageType] = useState<"success" | "error">(
+    "success"
+  );
 
   const [requests, setRequests] = useState<DateRequest[]>([]);
 
@@ -77,16 +81,19 @@ export default function AdminPage() {
     const data = await response.json();
 
     if (!response.ok) {
-      alert(data.message || "Talep güncellenemedi.");
+      setAdminMessageType("error");
+      setAdminMessage(data.message || "Talep güncellenemedi.");
       return;
     }
 
     if (data.emailWarning) {
-      alert(
-        `${data.message}\n\nHata: ${data.emailError || "Bilinmeyen hata"}`
+      setAdminMessageType("error");
+      setAdminMessage(
+        `${data.message}\n\n${data.emailError || "Bilinmeyen hata"}`
       );
     } else if (data.emailSent) {
-      alert("Talep onaylandı ve e-posta gönderildi.");
+      setAdminMessageType("success");
+      setAdminMessage("Talep onaylandı ve e-posta gönderildi.");
     }
 
     fetchRequests();
@@ -262,6 +269,29 @@ export default function AdminPage() {
                 Sil
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {adminMessage && (
+        <div className="modalOverlay" role="dialog" aria-modal="true">
+          <div
+            className={`themeModal adminStatusModal ${
+              adminMessageType === "success" ? "successModal" : "errorModal"
+            }`}
+          >
+            <div
+              className={`modalIcon ${
+                adminMessageType === "success" ? "successIcon" : ""
+              }`}
+            >
+              {adminMessageType === "success" ? "✓" : "!"}
+            </div>
+            <h3>{adminMessageType === "success" ? "İşlem başarılı" : "Uyarı"}</h3>
+            <p>{adminMessage}</p>
+            <button type="button" onClick={() => setAdminMessage("")}>
+              Tamam
+            </button>
           </div>
         </div>
       )}
