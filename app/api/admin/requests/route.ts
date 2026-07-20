@@ -55,7 +55,7 @@ export async function PATCH(request: NextRequest) {
     .from("date_requests")
     .update({ status })
     .eq("id", id)
-    .select("requester_name, contact, request_date, request_time")
+    .select("requester_name, contact, request_date, request_time, meeting_type")
     .single();
 
   if (error) {
@@ -75,6 +75,7 @@ export async function PATCH(request: NextRequest) {
           requesterName: updatedRequest.requester_name,
           requestDate: updatedRequest.request_date,
           requestTime: updatedRequest.request_time,
+          meetingType: updatedRequest.meeting_type,
         });
 
         if (!emailResult.success) {

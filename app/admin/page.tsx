@@ -11,6 +11,7 @@ type DateRequest = {
   created_at: string;
   request_date: string | null;
   request_time: string | null;
+  meeting_type: string | null;
 };
 
 export default function AdminPage() {
@@ -179,6 +180,11 @@ export default function AdminPage() {
                           request.request_time || "Saat yok"
                         }`
                       : "Tarih seçilmemiş"}
+                  </p>
+
+                  <p>
+                    <strong>Buluşma türü:</strong>{" "}
+                    {request.meeting_type || "Belirtilmemiş"}
                   </p>
 
                   <p>

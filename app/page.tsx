@@ -9,10 +9,18 @@ const HOURS = Array.from({ length: 24 }, (_, index) =>
 const MINUTES = Array.from({ length: 12 }, (_, index) =>
   String(index * 5).padStart(2, "0")
 );
+const MEETING_TYPES = [
+  "☕ Kahve",
+  "🍽️ Yemek",
+  "🚶 Yürüyüş",
+  "🎬 Sinema",
+  "✨ Sürpriz",
+];
 
 export default function HomePage() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [meetingType, setMeetingType] = useState("");
   const [requesterName, setRequesterName] = useState("");
   const [contact, setContact] = useState("");
   const [note, setNote] = useState("");
@@ -33,8 +41,16 @@ export default function HomePage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
-    if (!selectedDate || !selectedTime || !requesterName || !contact) {
-      setErrorMessage("Lütfen tarih, saat, ad ve e-posta adresini doldur.");
+    if (
+      !selectedDate ||
+      !selectedTime ||
+      !meetingType ||
+      !requesterName ||
+      !contact
+    ) {
+      setErrorMessage(
+        "Lütfen tarih, saat, buluşma türü, ad ve e-posta adresini doldur."
+      );
       return;
     }
 
@@ -55,6 +71,7 @@ export default function HomePage() {
       body: JSON.stringify({
         requestDate: selectedDate,
         requestTime: selectedTime,
+        meetingType,
         requesterName,
         contact,
         note,
@@ -75,6 +92,7 @@ export default function HomePage() {
 
     setSelectedDate("");
     setSelectedTime("");
+    setMeetingType("");
     setRequesterName("");
     setContact("");
     setNote("");
@@ -244,6 +262,27 @@ export default function HomePage() {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className="meetingTypeField">
+            <span>Buluşma türü</span>
+            <div className="meetingTypeOptions">
+              {MEETING_TYPES.map((type) => (
+                <button
+                  className={[
+                    "meetingTypeButton",
+                    meetingType === type ? "selectedMeetingType" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  key={type}
+                  type="button"
+                  onClick={() => setMeetingType(type)}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
 
           <label>

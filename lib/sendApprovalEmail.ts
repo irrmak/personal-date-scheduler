@@ -5,6 +5,7 @@ type SendApprovalEmailParams = {
   requesterName: string;
   requestDate: string | null;
   requestTime: string | null;
+  meetingType: string | null;
 };
 
 type EmailJsModule = {
@@ -27,6 +28,7 @@ export async function sendApprovalEmail({
   requesterName,
   requestDate,
   requestTime,
+  meetingType,
 }: SendApprovalEmailParams) {
   const serviceId = process.env.EMAILJS_SERVICE_ID;
   const templateId = process.env.EMAILJS_TEMPLATE_ID;
@@ -50,6 +52,7 @@ export async function sendApprovalEmail({
         requester_name: requesterName,
         request_date: requestDate || "-",
         request_time: requestTime || "-",
+        meeting_type: meetingType || "-",
       },
       {
         publicKey,

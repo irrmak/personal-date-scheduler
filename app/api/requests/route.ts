@@ -4,11 +4,15 @@ import { supabaseAdmin } from "@/lib/supabase";
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const { requestDate, requestTime, requesterName, contact, note } = body;
+  const { requestDate, requestTime, meetingType, requesterName, contact, note } =
+    body;
 
-  if (!requestDate || !requestTime || !requesterName || !contact) {
+  if (!requestDate || !requestTime || !meetingType || !requesterName || !contact) {
     return NextResponse.json(
-      { message: "Lütfen tarih, saat, ad ve e-posta adresini doldur." },
+      {
+        message:
+          "Lütfen tarih, saat, buluşma türü, ad ve e-posta adresini doldur.",
+      },
       { status: 400 }
     );
   }
@@ -23,6 +27,7 @@ export async function POST(request: NextRequest) {
   const { error } = await supabaseAdmin.from("date_requests").insert({
     request_date: requestDate,
     request_time: requestTime,
+    meeting_type: meetingType,
     requester_name: requesterName,
     contact,
     note,
